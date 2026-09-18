@@ -4,19 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TNT Snake</title>
-<!-- Standard Browser Favicons -->
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    
+    <!-- Standard Browser Favicons -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 
-<!-- Apple iOS Home Screen Icon -->
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <!-- Apple iOS Home Screen Icon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 
-<!-- Web App Manifest -->
-<link rel="manifest" href="site.webmanifest">
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="site.webmanifest">
 
-<!-- Android / Chrome Theme Color -->
-<meta name="theme-color" content="#121212">
+    <!-- Android / Chrome Theme Color -->
+    <meta name="theme-color" content="#121212">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
@@ -167,7 +168,7 @@
 </head>
 <body class="p-3 sm:p-6 w-screen m-0">
 
-    <header class="animate-entrance w-full max-w-3xl flex flex-col sm:flex-row justify-between items-center sm:items-end gap-4 mb-4 shrink-0 z-10 px-2 mx-auto">
+    <header class="animate-entrance w-full max-w-6xl flex flex-col sm:flex-row justify-between items-center sm:items-end gap-4 mb-4 shrink-0 z-10 px-2 mx-auto">
         <!-- Title -->
         <div class="flex items-center gap-2 text-primary self-start sm:self-auto">
             <span class="material-symbols-rounded text-3xl sm:text-4xl">stadia_controller</span>
@@ -196,7 +197,7 @@
         </div>
     </header>
 
-    <main id="game-wrapper" class="flex-1 w-full max-w-3xl min-h-0 flex justify-center items-center relative z-0 mx-auto">
+    <main id="game-wrapper" class="flex-1 w-full max-w-6xl min-h-0 flex justify-center items-center relative z-0 mx-auto">
         <div id="game-container" class="relative">
             <canvas id="gameCanvas" class="canvas-blurred"></canvas>
             
@@ -563,7 +564,8 @@
 
         // Game State Variables
         const gridSize = 20;
-        const tileCount = 20; 
+        let cols = 20;
+        let rows = 20; 
         let tileSize = 20;
         let speed = 110; 
         
@@ -597,10 +599,13 @@
             if (currentDifficulty === 'Hard') count = 15;
             
             let attempts = 0;
+            let midX = Math.floor(cols / 2);
+            let midY = Math.floor(rows / 2);
+
             while(obstacles.length < count && attempts < 300) {
                 attempts++;
-                let ox = Math.floor(Math.random() * tileCount);
-                let oy = Math.floor(Math.random() * tileCount);
+                let ox = Math.floor(Math.random() * cols);
+                let oy = Math.floor(Math.random() * rows);
                 
                 let isSafe = true;
                 
@@ -621,8 +626,8 @@
                     // Manhattan distance of 5 ensures it never traps you instantly
                     if (Math.abs(head.x - ox) + Math.abs(head.y - oy) < 5) isSafe = false;
                 } else {
-                    // Keep 7x7 center clear for the initial spawn
-                    if (ox >= 6 && ox <= 14 && oy >= 6 && oy <= 14) isSafe = false;
+                    // Keep center clear for the initial spawn
+                    if (ox >= midX - 4 && ox <= midX + 4 && oy >= midY - 4 && oy <= midY + 4) isSafe = false;
                 }
                 
                 // Prevent overlap with existing blocks
@@ -633,7 +638,9 @@
         }
 
         function initGame() {
-            snake = [{ x: 10, y: 10 }, { x: 10, y: 11 }, { x: 10, y: 12 }];
+            let midX = Math.floor(cols / 2);
+            let midY = Math.floor(rows / 2);
+            snake = [{ x: midX, y: midY }, { x: midX, y: midY + 1 }, { x: midX, y: midY + 2 }];
             generateObstacles();
             specialItems = [];
             inputQueue = [];
@@ -770,7 +777,7 @@
             const head = { x: snake[0].x + dx, y: snake[0].y + dy };
             
             // Collision Rules
-            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) return gameOver();
+            if (head.x < 0 || head.x >= cols || head.y < 0 || head.y >= rows) return gameOver();
             for (let i = 0; i < snake.length; i++) {
                 if (head.x === snake[i].x && head.y === snake[i].y) return gameOver();
             }
@@ -864,7 +871,7 @@
         function spawnFood() {
             let isSafe = false;
             while (!isSafe) {
-                food = { x: Math.floor(Math.random() * tileCount), y: Math.floor(Math.random() * tileCount) };
+                food = { x: Math.floor(Math.random() * cols), y: Math.floor(Math.random() * rows) };
                 isSafe = true;
                 for (let part of snake) {
                     if (part.x === food.x && part.y === food.y) { isSafe = false; break; }
@@ -901,8 +908,8 @@
                 
                 while (!isSafe && attempts < 50) {
                     attempts++;
-                    special.x = Math.floor(Math.random() * tileCount);
-                    special.y = Math.floor(Math.random() * tileCount);
+                    special.x = Math.floor(Math.random() * cols);
+                    special.y = Math.floor(Math.random() * rows);
                     isSafe = true;
                     
                     if (special.x === food.x && special.y === food.y) isSafe = false;
@@ -932,8 +939,8 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
             ctx.fillStyle = colors.bgAlt;
-            for(let row = 0; row < tileCount; row++) {
-                for(let col = 0; col < tileCount; col++) {
+            for(let row = 0; row < rows; row++) {
+                for(let col = 0; col < cols; col++) {
                     if ((row + col) % 2 !== 0) {
                         ctx.fillRect(
                             Math.floor(col * tileSize), 
@@ -1220,15 +1227,47 @@
             if (rect.width === 0 || rect.height === 0) return;
             
             const padding = 16;
-            const size = Math.floor(Math.min(rect.width, rect.height) - padding);
+            const availableWidth = rect.width - padding;
+            const availableHeight = rect.height - padding;
             
-            container.style.width = `${size}px`;
-            container.style.height = `${size}px`;
+            let logicalWidth, logicalHeight;
+            
+            // If the game isn't actively playing, we recalculate the optimal board dimensions
+            if (!isPlaying && !isPaused) {
+                const minTiles = 20;
+                const shortestEdge = Math.min(availableWidth, availableHeight);
+                const logicalTileSize = shortestEdge / minTiles;
+                
+                cols = Math.floor(availableWidth / logicalTileSize);
+                rows = Math.floor(availableHeight / logicalTileSize);
+            }
+            
+            // Lock and maintain aspect ratio of current grid dimensions
+            const gameAspect = cols / rows;
+            const screenAspect = availableWidth / availableHeight;
+            
+            if (screenAspect > gameAspect) {
+                // Screen is wider than game
+                logicalHeight = availableHeight;
+                logicalWidth = logicalHeight * gameAspect;
+            } else {
+                // Screen is taller than game
+                logicalWidth = availableWidth;
+                logicalHeight = logicalWidth / gameAspect;
+            }
+            
+            // Snap to precise multiples of tile size to avoid sub-pixel blurring
+            const finalTileSize = logicalWidth / cols;
+            logicalWidth = finalTileSize * cols;
+            logicalHeight = finalTileSize * rows;
+            
+            container.style.width = `${logicalWidth}px`;
+            container.style.height = `${logicalHeight}px`;
             
             const dpr = window.devicePixelRatio || 1;
-            canvas.width = size * dpr;
-            canvas.height = size * dpr;
-            tileSize = canvas.width / tileCount;
+            canvas.width = logicalWidth * dpr;
+            canvas.height = logicalHeight * dpr;
+            tileSize = canvas.width / cols;
             
             if (!isPlaying) draw();
         }
