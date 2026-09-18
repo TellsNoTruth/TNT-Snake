@@ -4,15 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TNT Snake</title>
-<!-- Standard Browser Favicon -->
-<link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-
-<!-- Apple iOS Home Screen Icon -->
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-
-<!-- Android / Chrome Theme Color -->
-<meta name="theme-color" content="#121212">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
@@ -579,7 +570,7 @@
         let specialItems = [];
         let dx = 0, dy = -1; 
         let score = 0;
-        let highScore = localStorage.getItem('materialSnakeHighScore') || 0;
+        let highScore = parseInt(sessionStorage.getItem('tntSnakeHighScore')) || 0;
         let obstacleTimer = 0;
         let obstacleShiftRate = 0;
 
@@ -668,7 +659,7 @@
             
             if (score > highScore) {
                 highScore = score;
-                localStorage.setItem('materialSnakeHighScore', highScore);
+                sessionStorage.setItem('tntSnakeHighScore', highScore);
                 highScoreEl.innerText = highScore;
             }
             
@@ -912,6 +903,13 @@
 
         function updateScoreDisplay() {
             scoreEl.innerText = score;
+            
+            // Update high score live during gameplay
+            if (score > highScore) {
+                highScore = score;
+                sessionStorage.setItem('tntSnakeHighScore', highScore);
+                highScoreEl.innerText = highScore;
+            }
         }
 
         // Inject timestamp variable to calculate ultra-smooth sin waves for lighting
